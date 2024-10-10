@@ -11,11 +11,11 @@ const rootElement = document.getElementById('root');
 const root = createRoot(rootElement);
 
 root.render(
-  <Suspense fallback={<Loader />}>
-    <HashRouter>
-      <App />
-    </HashRouter>
-  </Suspense>
+  <React.StrictMode>
+  <HashRouter> {/* Single Router wrapping App */}
+    <App />
+  </HashRouter>
+</React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

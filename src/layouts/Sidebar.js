@@ -1,22 +1,23 @@
+// Sidebar.js
 import React, { useState, useEffect } from 'react';
 import { Button, Nav, NavItem } from 'reactstrap';
-import { Link, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom'; // Use NavLink instead of Link
 import { FaTimes } from 'react-icons/fa'; // Importing icon for the close button
 
 const navigation = [
   {
     title: "Box Rater",
-    href: "/box-rater",
+    href: "box-rater", // Relative path
     icon: "bi bi-calculator",
   },
   {
     title: "Quick Trade",
-    href: "/quick-trade",
+    href: "quick-trade", // Relative path
     icon: "bi bi-person-lines-fill",
   },
   {
     title: "Input Rater",
-    href: "/input-rater",
+    href: "input-rater", // Relative path
     icon: "bi bi-box",
   },
 ];
@@ -72,7 +73,6 @@ const Sidebar = () => {
   const showMobilemenu = () => {
     document.getElementById('sidebarArea').classList.toggle('showSidebar');
   };
-  let location = useLocation();
 
   return (
     <div className="sidebar">
@@ -81,6 +81,7 @@ const Sidebar = () => {
         color="link"
         className="d-lg-none sidebar-close-btn"
         onClick={showMobilemenu}
+        aria-label="Close sidebar"
       >
         <FaTimes size={20} />
       </Button>
@@ -101,27 +102,24 @@ const Sidebar = () => {
       <Nav vertical className="sidebar-nav mt-4">
         {navigation.map((navi, index) => (
           <NavItem key={index} className="sidenav-bg">
-            <Link
+            <NavLink
               to={navi.href}
-              className={
-                location.pathname === navi.href
-                  ? 'nav-link active'
-                  : 'nav-link'
+              className={({ isActive }) =>
+                isActive ? 'nav-link active' : 'nav-link'
               }
             >
               <i className={`${navi.icon} me-2`}></i>
               <span>{navi.title}</span>
-            </Link>
+            </NavLink>
           </NavItem>
         ))}
-         {/* Disabling night mode for right now 
-
+        {/* Disabling night mode for right now 
         <div className="dark-mode-toggle text-center mt-3">
-        <button onClick={toggleDarkMode} className="theme-toggle-btn btn ">
-          {isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
-        </button>
-      </div>
-      */}
+          <button onClick={toggleDarkMode} className="theme-toggle-btn btn ">
+            {isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
+          </button>
+        </div>
+        */}
       </Nav>
     </div>
   );
