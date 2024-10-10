@@ -1,0 +1,2 @@
+.header{background-color:#fff;background-color:var(--header-bg,#fff);box-shadow:0 2px 4px #0000001a;padding:10px 0;z-index:1030}.header .logo h3{color:#007bff;color:var(--primary-color,#007bff);margin:0}.header .theme-toggle-btn{font-size:1.5rem}.dark-mode .header{background-color:#343a40;background-color:var(--header-bg-dark,#343a40);box-shadow:0 2px 4px #00000080}.dark-mode .header .logo h3{color:#fff;color:var(--body-bg,#fff)}body{padding-top:60px;transition:padding-top .3s ease-in-out}
+/*# sourceMappingURL=519.c5085f6e.chunk.css.map*/
