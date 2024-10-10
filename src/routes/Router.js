@@ -1,3 +1,4 @@
+// routes/Router.js
 import { lazy } from "react";
 import { Navigate } from "react-router-dom";
 
@@ -12,8 +13,8 @@ const ThemeRoutes = [
     element: <FullLayout />,
     children: [
       { path: "/", element: <Navigate to="/box-rater" /> },
-      { path: "/box-rater", exact: true, element: <BoxRater /> },
-      { path: "/quick-trade", exact: true, element: <QuickTrade /> },
+      { path: "/box-rater", element: <BoxRater /> },
+      { path: "/quick-trade", element: <QuickTrade /> },
     ],
   },
 ];
