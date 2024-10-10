@@ -1,0 +1,37 @@
+
+.pokechart-card {
+    background-color: var(--card-bg);
+    border: none;
+  
+    .card-title {
+      font-weight: bold;
+      color: var(--body-color);
+    }
+  
+    .card-subtitle {
+      color: var(--secondary-color);
+    }
+  
+    .chart-container {
+      position: relative;
+      width: 100%;
+      margin: 0 auto;
+    }
+  
+    /* Customize ApexCharts elements */
+    .apexcharts-tooltip {
+      border-radius: 8px !important;
+      background-color: var(--card-bg) !important;
+      color: var(--body-color) !important;
+      box-shadow: var(--box-shadow) !important;
+    }
+  
+    .apexcharts-legend-text {
+      color: var(--body-color) !important;
+    }
+  
+    .apexcharts-data-labels {
+      overflow: visible;
+    }
+  }
+  

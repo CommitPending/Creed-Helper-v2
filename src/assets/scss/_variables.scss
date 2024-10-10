@@ -1,0 +1,57 @@
+/* _variables.scss */
+
+/*******************/
+/* Theme Fonts     */
+/*******************/
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap");
+$font-family-sans-serif: "Poppins", sans-serif;
+
+/*******************/
+/* Base Colors     */
+/*******************/
+$white: #ffffff !default;
+$black: #000000 !default;
+
+/*******************/
+/* Light Mode Colors */
+/*******************/
+$primary-light: #007bff;
+$secondary-light: #6c757d;
+$success-light: #28a745;
+$info-light: #17a2b8;
+$warning-light: #ffc107;
+$danger-light: #dc3545;
+$light-light: #f8f9fa;
+$dark-light: #343a40;
+
+$body-bg-light: $white;
+$body-color-light: $black;
+$sidebar-bg-light: $white;
+$header-bg-light: $white;
+$card-bg-light: $white;
+
+/*******************/
+/* Dark Mode Colors */
+/*******************/
+$primary-dark: #375a7f;
+$secondary-dark: #444444;
+$success-dark: #00bc8c;
+$info-dark: #3498db;
+$warning-dark: #f39c12;
+$danger-dark: #e74c3c;
+$light-dark: #555555;
+$dark-dark: #222222;
+
+$body-bg-dark: $black;
+$body-color-dark: #eaeaea; // Light gray text
+$sidebar-bg-dark: $black;
+$header-bg-dark: $black;
+$card-bg-dark: #1e1e1e;
+
+/*******************/
+/* Common Variables */
+/*******************/
+$font-weight-bold: 500 !default;
+$border-radius: 0.3rem !default;
+$box-shadow: 0 0.5rem 1rem rgba($black, 0.15) !default;
+$sidebarWidth: 260px !default;

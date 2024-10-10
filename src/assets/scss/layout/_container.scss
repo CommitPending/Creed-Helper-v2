@@ -1,0 +1,52 @@
+/* layout/container.scss */
+
+.pageWrapper {
+  min-height: 100vh;
+}
+
+.contentArea {
+  flex-grow: 1;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.card {
+  background-color: var(--card-bg);
+  color: var(--body-color);
+  box-shadow: var(--box-shadow);
+  margin-bottom: 30px;
+}
+
+.circle-box {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: var(--body-bg);
+
+  &.lg-box {
+    width: 60px;
+    height: 60px;
+    font-size: 21px;
+    line-height: 60px;
+  }
+}
+
+.button-group .btn {
+  margin: 3px;
+}
+
+table th {
+  font-weight: 500;
+  color: var(--body-color);
+}
+
+.table > :not(:first-child) {
+  border-top: 2px solid var(--body-color);
+}
+
+.table-borderless > :not(:first-child) {
+  border-top-width: 0;
+}

@@ -1,0 +1,35 @@
+/* layout/sidebar.scss */
+
+.sidebarArea {
+  flex-shrink: 0;
+  width: var(--sidebar-width);
+  background-color: var(--sidebar-bg);
+  color: var(--body-color);
+
+  .sidenav-bg:hover {
+    background-color: var(--light);
+    border-radius: var(--border-radius);
+  }
+
+  .sidenav-bg .active {
+    background-color: var(--primary);
+    border-radius: var(--border-radius);
+    color: var(--body-bg);
+  }
+}
+
+@include media-breakpoint-down(lg) {
+  .sidebarArea {
+    position: fixed;
+    height: 100%;
+    overflow: auto;
+    top: 0;
+    z-index: 1;
+    margin-left: calc(-1 * var(--sidebar-width));
+    transition: 0.2s ease-in;
+
+    &.showSidebar {
+      margin-left: 0;
+    }
+  }
+}

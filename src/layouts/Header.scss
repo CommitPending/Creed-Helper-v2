@@ -1,0 +1,33 @@
+/* Header.scss */
+
+.header {
+    background-color: var(--header-bg, #ffffff);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px 0;
+    z-index: 1030; /* Ensure it sits above the sidebar */
+  
+    .logo h3 {
+      margin: 0;
+      color: var(--primary-color, #007bff);
+    }
+  
+    .theme-toggle-btn {
+      font-size: 1.5rem;
+    }
+  
+    .dark-mode & {
+      background-color: var(--header-bg-dark, #343a40);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  
+      .logo h3 {
+        color: var(--body-bg, #ffffff);
+      }
+    }
+  }
+  
+  /* Adjust body padding to account for fixed header */
+  body {
+    padding-top: 60px; /* Height of the header */
+    transition: padding-top 0.3s ease-in-out;
+  }
+  
