@@ -10,6 +10,8 @@
  * Released under the MIT License.
  */
 
+/*! sheetjs (C) 2013-present SheetJS -- http://sheetjs.com */
+
 /*! svg.draggable.js - v2.2.2 - 2019-01-08
 * https://github.com/svgdotjs/svg.draggable.js
 * Copyright (c) 2019 Wout Fierens; Licensed MIT */
@@ -17,6 +19,8 @@
 /*! svg.filter.js - v2.0.2 - 2016-02-24
 * https://github.com/wout/svg.filter.js
 * Copyright (c) 2016 Wout Fierens; Licensed MIT */
+
+/*! xlsx.js (C) 2013-present SheetJS -- http://sheetjs.com */
 
 /**
  * @license React
