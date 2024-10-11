@@ -1,91 +1,89 @@
-// Sidebar.js
-import React, { useState, useEffect } from 'react';
-import { Button, Nav, NavItem } from 'reactstrap';
-import { NavLink } from 'react-router-dom'; // Use NavLink instead of Link
-import { FaTimes } from 'react-icons/fa'; // Importing icon for the close button
+import React, { useState, useEffect, useRef } from 'react'
+import { useRecoilState } from 'recoil'
+import { sidebarState } from '../components/recoil/recoilState'
+import { Nav, NavItem } from 'reactstrap'
+import { NavLink, useNavigate } from 'react-router-dom'
 
 const navigation = [
+  { title: 'Box Rater', href: 'box-rater', icon: 'bi bi-calculator' },
   {
-    title: "Box Rater",
-    href: "box-rater", // Relative path
-    icon: "bi bi-calculator",
+    title: 'Trade Helper',
+    href: 'trade-helper',
+    icon: 'bi bi-person-lines-fill',
   },
-  {
-    title: "Quick Trade",
-    href: "quick-trade", // Relative path
-    icon: "bi bi-person-lines-fill",
-  },
-  {
-    title: "Input Rater",
-    href: "input-rater", // Relative path
-    icon: "bi bi-box",
-  },
-];
+  { title: 'Input Rater', href: 'input-rater', icon: 'bi bi-box' },
+]
 
 const Sidebar = () => {
-  const [promo, setPromo] = useState('');
-  const [promoImage, setPromoImage] = useState('');
-
-  // Dark Mode State and Effect
+  const [promo, setPromo] = useState('')
+  const [promoImage, setPromoImage] = useState('')
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    const savedMode = localStorage.getItem('isDarkMode');
-    return savedMode ? JSON.parse(savedMode) : false;
-  });
+    const savedMode = localStorage.getItem('isDarkMode')
+    return savedMode ? JSON.parse(savedMode) : false
+  })
+  const [isSidebarOpen, setIsSidebarOpen] = useRecoilState(sidebarState)
+  const sidebarRef = useRef(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
-    // Fetch the promo data when the component mounts
     const fetchPromo = async () => {
       try {
         const response = await fetch(
           'https://pokemoncreed.net/ajax/pokedex.php?pokemon=promo'
-        );
-        const data = await response.json();
+        )
+        const data = await response.json()
         if (data.success) {
-          setPromo(data.name); // Set the promo name
-          setPromoImage(`https://pokemoncreed.net/sprites/${data.name}.png`); // Set the promo image URL
+          setPromo(data.name)
+          setPromoImage(`https://pokemoncreed.net/sprites/${data.name}.png`)
         } else {
-          console.error('Failed to fetch promo data');
+          console.error('Failed to fetch promo data')
         }
       } catch (error) {
-        console.error('Error fetching promo data:', error);
+        console.error('Error fetching promo data:', error)
       }
-    };
+    }
 
-    fetchPromo();
-  }, []);
+    fetchPromo()
+  }, [])
 
   useEffect(() => {
-    // Apply or remove the dark-mode class on the body element
-    const body = document.body;
+    const body = document.body
     if (isDarkMode) {
-      body.classList.add('dark-mode');
+      body.classList.add('dark-mode')
     } else {
-      body.classList.remove('dark-mode');
+      body.classList.remove('dark-mode')
     }
-    // Save the preference to localStorage
-    localStorage.setItem('isDarkMode', JSON.stringify(isDarkMode));
-  }, [isDarkMode]);
+    localStorage.setItem('isDarkMode', JSON.stringify(isDarkMode))
+  }, [isDarkMode])
 
-  const toggleDarkMode = () => {
-    setIsDarkMode((prevMode) => !prevMode);
-  };
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        setIsSidebarOpen(false)
+      }
+    }
 
-  const showMobilemenu = () => {
-    document.getElementById('sidebarArea').classList.toggle('showSidebar');
-  };
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [setIsSidebarOpen])
+
+  const handleLinkClick = (path) => {
+    const sidebar = document.getElementById('sidebarArea')
+    sidebar.classList.toggle('showSidebar')
+    if (window.innerWidth <= 992) {
+      setIsSidebarOpen(false)
+    }
+    navigate(`/${path}`)
+  }
 
   return (
-    <div className="sidebar">
-      {/* Close button for mobile view */}
-      <Button
-        color="link"
-        className="d-lg-none sidebar-close-btn"
-        onClick={showMobilemenu}
-        aria-label="Close sidebar"
-      >
-        <FaTimes size={20} />
-      </Button>
-
+    <div
+      id="sidebarArea"
+      className={`sidebar ${isSidebarOpen ? 'showSidebar' : ''}`}
+      ref={sidebarRef}
+    >
       <div className="sidebar-promo text-center">
         {promoImage && (
           <img
@@ -107,22 +105,16 @@ const Sidebar = () => {
               className={({ isActive }) =>
                 isActive ? 'nav-link active' : 'nav-link'
               }
+              onClick={handleLinkClick} // Close sidebar when link is clicked
             >
               <i className={`${navi.icon} me-2`}></i>
               <span>{navi.title}</span>
             </NavLink>
           </NavItem>
         ))}
-        {/* Disabling night mode for right now 
-        <div className="dark-mode-toggle text-center mt-3">
-          <button onClick={toggleDarkMode} className="theme-toggle-btn btn ">
-            {isDarkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
-          </button>
-        </div>
-        */}
       </Nav>
     </div>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

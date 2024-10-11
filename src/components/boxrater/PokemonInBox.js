@@ -1,113 +1,154 @@
-import React from 'react';
-import { Card, CardBody, CardTitle, CardSubtitle, ListGroup, ListGroupItem } from 'reactstrap';
-import { useRecoilValue } from 'recoil';
-import { pokemonDetailsState } from '../recoil/recoilState'; // Import the Recoil atom
+import React from 'react'
+import {
+  Card,
+  CardBody,
+  CardTitle,
+  CardSubtitle,
+  ListGroup,
+  ListGroupItem,
+  Button,
+} from 'reactstrap'
+import { useRecoilValue } from 'recoil'
+import { pokemonDetailsState } from '../recoil/recoilState'
+import * as XLSX from 'xlsx'
 
 const PokemonInBox = () => {
   // Retrieve the data from Recoil
-  const pokemonDetails = useRecoilValue(pokemonDetailsState);
+  const pokemonDetails = useRecoilValue(pokemonDetailsState)
 
-  // Corrected rate conversion function with logging
+  // Function to convert rates
   const convertRateToNumber = (rateString) => {
     if (!rateString || typeof rateString !== 'string') {
-      console.warn(`Invalid rate string: ${rateString}`);
-      return 0; // Default to 0 if the rate is not defined or not a string
+      console.warn(`Invalid rate string: ${rateString}`)
+      return 0
     }
 
-    // Extract the numeric part
-    const match = rateString.match(/[\d.]+/);
+    const match = rateString.match(/[\d.]+/)
     if (!match) {
-      console.warn(`No numeric value found in rate string: ${rateString}`);
-      return 0;
+      console.warn(`No numeric value found in rate string: ${rateString}`)
+      return 0
     }
 
-    const value = parseFloat(match[0]); // Parse the numeric part
+    const value = parseFloat(match[0])
 
     if (rateString.includes('m')) {
-      return value * 1_000_000;
+      return value * 1_000_000
     } else if (rateString.includes('k')) {
-      return value * 1_000;
+      return value * 1_000
     }
-    return value;
-  };
+    return value
+  }
 
-  // Helper function to format numbers back into strings like '1.5k' or '3m'
+  // Helper function to format numbers
   const formatRate = (rate) => {
     if (rate >= 1_000_000) {
-      return `${(rate / 1_000_000).toFixed(2)}m`;
+      return `${(rate / 1_000_000).toFixed(2)}m`
     } else if (rate >= 1_000) {
-      return `${(rate / 1_000).toFixed(2)}k`;
+      return `${(rate / 1_000).toFixed(2)}k`
     } else {
-      return rate.toFixed(2);
+      return rate.toFixed(2)
     }
-  };
+  }
 
-  // Function to group and format the Pokémon data
+  // Function to group Pokémon
   const groupPokemon = (pokemonList) => {
-    const grouped = {};
+    const grouped = {}
 
     pokemonList.forEach((pokemon) => {
-      const key = `${pokemon.name} ${pokemon.gender || ''} - Level: ${pokemon.level}`;
+      const key = `${pokemon.name} ${pokemon.gender || ''} - Level: ${pokemon.level}`
       if (!grouped[key]) {
-        grouped[key] = { ...pokemon, count: 1 };
+        grouped[key] = { ...pokemon, count: 1 }
       } else {
-        grouped[key].count += 1;
+        grouped[key].count += 1
       }
-    });
+    })
 
-    // Convert the grouped object into an array for rendering
     return Object.entries(grouped).map(([key, details]) => {
-      // Ensure that we access the correct property for the rate
-      const rateString = details.rate || details.formattedRate;
-      const rateValue = convertRateToNumber(rateString);
-      const totalRate = rateValue * details.count;
-
-      // Format the total rate back into a readable format (e.g., 1.5m, 1.5k)
-      const formattedTotalRate = formatRate(totalRate);
+      const rateString = details.rate || details.formattedRate
+      const rateValue = convertRateToNumber(rateString)
+      const totalRate = rateValue * details.count
+      const formattedTotalRate = formatRate(totalRate)
 
       return {
         ...details,
         display: `${details.count}x ${key} [${formattedTotalRate}]`,
-      };
-    });
-  };
+      }
+    })
+  }
 
   const renderPokemonList = (pokemonList) => {
-    const groupedPokemon = groupPokemon(pokemonList);
+    const groupedPokemon = groupPokemon(pokemonList)
 
     return groupedPokemon.map((pokemon, index) => (
       <ListGroupItem key={index} className="d-flex align-items-center">
         {pokemon.display}
       </ListGroupItem>
-    ));
-  };
+    ))
+  }
 
+  // Function to render ignored Pokémon
   const renderIgnoredPokemon = (ignoredList) => {
-    const groupedIgnored = {};
+    const groupedIgnored = {}
 
     ignoredList.forEach((pokemon) => {
-      const key = `${pokemon.name} ${pokemon.gender}`;
+      const key = `${pokemon.name} ${pokemon.gender} - Level: ${pokemon.level}`
       if (groupedIgnored[key]) {
-        groupedIgnored[key].count += 1;
+        groupedIgnored[key].count += 1
       } else {
-        groupedIgnored[key] = { ...pokemon, count: 1 };
+        groupedIgnored[key] = { ...pokemon, count: 1 }
       }
-    });
+    })
 
     return Object.entries(groupedIgnored).map(([key, details], index) => (
       <ListGroupItem key={index} className="d-flex align-items-center">
-        {details.count}x {details.name} {details.gender && `${details.gender}`} - Level: {details.level}
+        {details.count}x {details.name} {details.gender && `${details.gender}`}{' '}
+        - Level: {details.level}
       </ListGroupItem>
-    ));
-  };
+    ))
+  }
+
+  // Function to download Excel sheet
+  const downloadExcel = () => {
+    const username = pokemonDetails.uname
+    const date = new Date().toLocaleDateString().replace(/\//g, '-')
+    const filename = `${username}_BoxRate_${date}.xlsx`
+
+    const consideredPokemon = groupPokemon(pokemonDetails.consideredPokemon)
+    const ignoredPokemon = groupPokemon(pokemonDetails.ignoredPokemon)
+
+    // Create worksheet data
+    const data = [
+      { Category: 'Considered Pokémon', Pokemon: '' },
+      ...consideredPokemon.map((p) => ({ Category: '', Pokemon: p.display })),
+      { Category: 'Ignored Pokémon', Pokemon: '' },
+      ...ignoredPokemon.map((p) => ({ Category: '', Pokemon: p.display })),
+    ]
+
+    // Create a worksheet and a workbook
+    const ws = XLSX.utils.json_to_sheet(data, {
+      header: ['Category', 'Pokemon'],
+    })
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Pokemon Rates')
+
+    // Write the file and download
+    XLSX.writeFile(wb, filename)
+  }
 
   return (
     <Card className="mt-4">
       <CardBody>
-        <CardTitle tag="h5">Pokemon in Box</CardTitle>
-        <CardSubtitle className="mb-3 text-muted" tag="h6">
-          Considered and Ignored Pokémon
-        </CardSubtitle>
+        <div className="d-flex justify-content-between align-items-center">
+          <div>
+            <CardTitle tag="h5">Pokemon in Box</CardTitle>
+            <CardSubtitle className="mb-3 text-muted" tag="h6">
+              Considered and Ignored Pokémon
+            </CardSubtitle>
+          </div>
+          <Button color="primary" onClick={downloadExcel}>
+            Download Excel Sheet
+          </Button>
+        </div>
 
         <h6 className="mt-4">Considered Pokémon:</h6>
         <ListGroup flush className="mb-4">
@@ -128,7 +169,7 @@ const PokemonInBox = () => {
         </ListGroup>
       </CardBody>
     </Card>
-  );
-};
+  )
+}
 
-export default PokemonInBox;
+export default PokemonInBox

@@ -1,7 +1,7 @@
-import { atom } from 'recoil';
+import { atom } from 'recoil'
 
 export const pokemonDetailsState = atom({
-  key: 'pokemonDetailsState', 
+  key: 'pokemonDetailsState',
   default: {
     uname: '',
     uid: '',
@@ -9,16 +9,20 @@ export const pokemonDetailsState = atom({
     consideredPokemon: [],
     ignoredPokemon: [],
   },
-});
-
+})
 
 export const categorizedTotalsState = atom({
-    key: 'categorizedTotalsState',
-    default: {
-      Luminous: 0,
-      Cursed: 0,
-      Gold: 0,
-      Rainbow: 0,
-      Shadow: 0,
-    },
-  });
+  key: 'categorizedTotalsState',
+  default: {
+    Luminous: 0,
+    Cursed: 0,
+    Gold: 0,
+    Rainbow: 0,
+    Shadow: 0,
+  },
+})
+
+export const sidebarState = atom({
+  key: 'sidebarState',
+  default: false,
+})

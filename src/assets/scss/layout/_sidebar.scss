@@ -20,16 +20,22 @@
 
 @include media-breakpoint-down(lg) {
   .sidebarArea {
-    position: fixed;
-    height: 100%;
+    position: absolute;
+    width: 100%; // Full width on mobile
+    top: 60px; // Adjust this value based on your header height
+    left: 0;
+    height: calc(100% - 60px); // Fill the remaining height below the header
     overflow: auto;
-    top: 0;
     z-index: 1;
-    margin-left: calc(-1 * var(--sidebar-width));
-    transition: 0.2s ease-in;
+    transform: translateY(-100%); // Initially hidden
+    transition: transform 0.3s ease-in-out;
 
     &.showSidebar {
-      margin-left: 0;
+      transform: translateY(0); // Slide down when shown
     }
+  }
+
+  .contentArea {
+    margin-top: 60px; // Ensure content starts below the header in mobile view
   }
 }

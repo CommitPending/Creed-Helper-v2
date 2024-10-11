@@ -1,21 +1,23 @@
-import React from 'react';
-import { useRecoilValue } from 'recoil';
-import { categorizedTotalsState } from '../recoil/recoilState';
-import { Card, CardBody, CardTitle, CardSubtitle } from 'reactstrap';
-import Chart from 'react-apexcharts';
-import '../../assets/scss/pokechart.scss'; 
+import React from 'react'
+import { useRecoilValue } from 'recoil'
+import { categorizedTotalsState } from '../recoil/recoilState'
+import { Card, CardBody, CardTitle, CardSubtitle } from 'reactstrap'
+import Chart from 'react-apexcharts'
+import '../../assets/scss/pokechart.scss'
 
 const PokeChart = () => {
-  const categorizedTotals = useRecoilValue(categorizedTotalsState);
+  const categorizedTotals = useRecoilValue(categorizedTotalsState)
 
   // Calculate the series and total value
-  const series = Object.values(categorizedTotals).map((value) => parseFloat(value));
-  const totalValue = series.reduce((a, b) => a + b, 0);
+  const series = Object.values(categorizedTotals).map((value) =>
+    parseFloat(value)
+  )
+  const totalValue = series.reduce((a, b) => a + b, 0)
 
   // Generate a key based on categorizedTotals to force re-render
   const chartKey = Object.entries(categorizedTotals)
     .map(([key, value]) => `${key}-${value}`)
-    .join('_');
+    .join('_')
 
   const options = {
     chart: {
@@ -29,13 +31,7 @@ const PokeChart = () => {
       },
     },
     labels: Object.keys(categorizedTotals),
-    colors: [
-      '#2de7e0', 
-      '#b71515', 
-      '#ffc107', 
-      '#28a745', 
-      '#573c9c', 
-    ],
+    colors: ['#2de7e0', '#b71515', '#ffc107', '#28a745', '#573c9c'],
     legend: {
       show: true,
       position: 'bottom',
@@ -88,7 +84,7 @@ const PokeChart = () => {
               fontWeight: 'bold',
               color: 'var(--body-color)',
               formatter: (val) => {
-                return parseFloat(val).toLocaleString();
+                return parseFloat(val).toLocaleString()
               },
             },
             total: {
@@ -98,7 +94,7 @@ const PokeChart = () => {
               fontSize: '18px',
               fontWeight: 'bold',
               formatter: () => {
-                return totalValue.toLocaleString();
+                return totalValue.toLocaleString()
               },
             },
           },
@@ -141,7 +137,7 @@ const PokeChart = () => {
         },
       },
     ],
-  };
+  }
 
   return (
     <Card className="pokechart-card shadow-lg p-3 mb-5 rounded">
@@ -163,7 +159,7 @@ const PokeChart = () => {
         </div>
       </CardBody>
     </Card>
-  );
-};
+  )
+}
 
-export default PokeChart;
+export default PokeChart

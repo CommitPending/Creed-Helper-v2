@@ -1,5 +1,5 @@
 // QuickTrade.js
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react'
 import {
   Card,
   CardBody,
@@ -17,21 +17,21 @@ import {
   Spinner,
   Collapse,
   UncontrolledTooltip,
-} from 'reactstrap';
-import { useSetRecoilState } from 'recoil';
-import { categorizedTotalsState } from '../components/recoil/recoilState'; // Import the Recoil atom
-import PokeChart from '../components/boxrater/PokeChart'; // Import the PokeChart component
+} from 'reactstrap'
+import { useSetRecoilState } from 'recoil'
+import { categorizedTotalsState } from '../components/recoil/recoilState' // Import the Recoil atom
+import PokeChart from '../components/boxrater/PokeChart' // Import the PokeChart component
 
-const QuickTrade = () => {
+const TradeHelper = () => {
   // State for 'Trading For' portion
   const [tradingForList, setTradingForList] = useState([
     { id: 1, type: 'Golden', name: '', cost: '', currency: 'K' },
-  ]);
+  ])
 
-  const [totalTradingForValue, setTotalTradingForValue] = useState(0);
+  const [totalTradingForValue, setTotalTradingForValue] = useState(0)
 
   // State for username and options
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState('')
   const [excludedTypes, setExcludedTypes] = useState({
     Golden: false,
     Cursed: false,
@@ -39,9 +39,9 @@ const QuickTrade = () => {
     Shadow: false,
     Rainbow: false,
     unbased: false,
-  });
+  })
 
-  const [usePercentages, setUsePercentages] = useState(false);
+  const [usePercentages, setUsePercentages] = useState(false)
 
   const [percentages, setPercentages] = useState({
     Golden: 20,
@@ -49,33 +49,35 @@ const QuickTrade = () => {
     Luminous: 20,
     Shadow: 20,
     Rainbow: 20,
-  });
+  })
 
-  const [excludePokemonList, setExcludePokemonList] = useState([]);
+  const [excludePokemonList, setExcludePokemonList] = useState([])
   const [excludePokemon, setExcludePokemon] = useState({
     type: 'Golden',
     name: '',
-  });
+  })
 
-  const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(false)
 
   // State for trade suggestions
-  const [tradeSuggestions, setTradeSuggestions] = useState([]);
-  const [tradingForDetails, setTradingForDetails] = useState([]);
+  const [tradeSuggestions, setTradeSuggestions] = useState([])
+  const [tradingForDetails, setTradingForDetails] = useState([])
 
   // Rates cache to reduce API calls
-  const ratesCacheRef = useRef({});
+  const ratesCacheRef = useRef({})
 
   // Recoil state setters
-  const setCategorizedTotals = useSetRecoilState(categorizedTotalsState);
+  const setCategorizedTotals = useSetRecoilState(categorizedTotalsState)
 
   // Handle changes in 'Trading For' list
   const handleTradingForChange = (id, field, value) => {
     setTradingForList((prevList) =>
-      prevList.map((item) => (item.id === id ? { ...item, [field]: value } : item))
-    );
-  };
+      prevList.map((item) =>
+        item.id === id ? { ...item, [field]: value } : item
+      )
+    )
+  }
 
   // Add a new item to 'Trading For' list
   const addTradingForItem = () => {
@@ -88,312 +90,315 @@ const QuickTrade = () => {
         cost: '',
         currency: 'K',
       },
-    ]);
-  };
+    ])
+  }
 
   // Remove an item from 'Trading For' list
   const removeTradingForItem = (id) => {
-    setTradingForList((prevList) => prevList.filter((item) => item.id !== id));
-  };
+    setTradingForList((prevList) => prevList.filter((item) => item.id !== id))
+  }
 
   // Fetch cost if the cost field is empty
   const fetchCostIfEmpty = async (id) => {
-    const item = tradingForList.find((i) => i.id === id);
+    const item = tradingForList.find((i) => i.id === id)
     if (item && item.cost.trim() === '') {
-      const { type, name } = item;
+      const { type, name } = item
       if (name.trim() !== '') {
-        const combinedName = `${type}${name}`;
+        const combinedName = `${type}${name}`
         try {
           const response = await fetch(
             `https://pokemoncreed.net/ajax/pokedex.php?pokemon=${encodeURIComponent(
               combinedName.toLowerCase()
             )}`
-          );
-          const data = await response.json();
-          const rate = data.rating || 'N/A';
+          )
+          const data = await response.json()
+          const rate = data.rating || 'N/A'
           if (rate === 'N/A') {
-            setMessage(`Rate for ${combinedName} is not available.`);
-            return;
+            setMessage(`Rate for ${combinedName} is not available.`)
+            return
           }
-          let formattedCost;
-          let currency;
+          let formattedCost
+          let currency
           if (rate.includes('m')) {
-            formattedCost = parseFloat(rate.replace('m', '')); // e.g., '1.5m' => 1.5
-            currency = 'M';
+            formattedCost = parseFloat(rate.replace('m', '')) // e.g., '1.5m' => 1.5
+            currency = 'M'
           } else if (rate.includes('k')) {
-            formattedCost = parseFloat(rate.replace('k', '')); // e.g., '500k' => 500
-            currency = 'K';
+            formattedCost = parseFloat(rate.replace('k', '')) // e.g., '500k' => 500
+            currency = 'K'
           } else {
-            formattedCost = parseFloat(rate);
-            currency = '';
+            formattedCost = parseFloat(rate)
+            currency = ''
           }
           // Update the cost field
           setTradingForList((prevList) =>
             prevList.map((i) =>
-              i.id === id ? { ...i, cost: formattedCost.toString(), currency } : i
+              i.id === id
+                ? { ...i, cost: formattedCost.toString(), currency }
+                : i
             )
-          );
+          )
         } catch (error) {
-          console.error('Error fetching cost:', error);
-          setMessage(`Error fetching cost for ${combinedName}.`);
+          console.error('Error fetching cost:', error)
+          setMessage(`Error fetching cost for ${combinedName}.`)
         }
       }
     }
-  };
+  }
 
   // Fetch costs for all items with empty cost fields before generating suggestions
   const fetchCostsForAll = async () => {
     const fetchPromises = tradingForList.map(async (item) => {
       if (item.cost.trim() === '') {
-        await fetchCostIfEmpty(item.id);
+        await fetchCostIfEmpty(item.id)
       }
-    });
-    await Promise.all(fetchPromises);
-  };
+    })
+    await Promise.all(fetchPromises)
+  }
 
   // Calculate total 'Trading For' value whenever the list changes
   useEffect(() => {
-    let total = 0;
+    let total = 0
     tradingForList.forEach((item) => {
-      let cost = parseFloat(item.cost);
-      if (isNaN(cost)) cost = 0;
+      let cost = parseFloat(item.cost)
+      if (isNaN(cost)) cost = 0
       if (item.currency === 'M') {
-        cost *= 1_000_000;
+        cost *= 1_000_000
       } else if (item.currency === 'K') {
-        cost *= 1_000;
+        cost *= 1_000
       }
-      total += cost;
-    });
-    setTotalTradingForValue(total);
-  }, [tradingForList]);
+      total += cost
+    })
+    setTotalTradingForValue(total)
+  }, [tradingForList])
 
   // Handle exclude type changes
   const handleExcludeTypeChange = (type, checked) => {
     setExcludedTypes((prev) => ({
       ...prev,
       [type]: checked,
-    }));
+    }))
 
     // Adjust percentages
     setPercentages((prevPercentages) => {
-      const newPercentages = { ...prevPercentages };
+      const newPercentages = { ...prevPercentages }
 
       if (checked) {
         // Type is being excluded
-        const excludedPercentage = newPercentages[type] || 0;
-        delete newPercentages[type];
+        const excludedPercentage = newPercentages[type] || 0
+        delete newPercentages[type]
 
-        const remainingTypes = Object.keys(newPercentages);
+        const remainingTypes = Object.keys(newPercentages)
         const totalRemaining = remainingTypes.reduce(
           (sum, t) => sum + newPercentages[t],
           0
-        );
+        )
 
         // Redistribute the excluded percentage among remaining types proportionally
         remainingTypes.forEach((t) => {
-          newPercentages[t] += (newPercentages[t] / totalRemaining) * excludedPercentage;
-        });
+          newPercentages[t] +=
+            (newPercentages[t] / totalRemaining) * excludedPercentage
+        })
       } else {
         // Type is being included
-        const includedTypes = Object.keys(newPercentages);
+        const includedTypes = Object.keys(newPercentages)
         const totalIncluded = includedTypes.reduce(
           (sum, t) => sum + newPercentages[t],
           0
-        );
+        )
 
         // Add the type with 0% initially
-        newPercentages[type] = 0;
+        newPercentages[type] = 0
 
         // Adjust percentages to sum to 100%
         Object.keys(newPercentages).forEach((t) => {
-          newPercentages[t] = (newPercentages[t] / totalIncluded) * 100;
-        });
+          newPercentages[t] = (newPercentages[t] / totalIncluded) * 100
+        })
       }
 
-      return newPercentages;
-    });
-  };
+      return newPercentages
+    })
+  }
 
   // Handle percentage changes
   const handlePercentageChange = (type, value) => {
-    value = Number(value);
-    if (value < 0) value = 0;
-    if (value > 100) value = 100;
+    value = Number(value)
+    if (value < 0) value = 0
+    if (value > 100) value = 100
 
     setPercentages((prevPercentages) => {
-      const adjustedPercentages = { ...prevPercentages };
-      const oldValue = adjustedPercentages[type];
-      const diff = value - oldValue;
-      adjustedPercentages[type] = value;
+      const adjustedPercentages = { ...prevPercentages }
+      const oldValue = adjustedPercentages[type]
+      const diff = value - oldValue
+      adjustedPercentages[type] = value
 
       const otherTypes = Object.keys(adjustedPercentages).filter(
         (t) => t !== type && !excludedTypes[t]
-      );
+      )
 
       let totalOtherPercentages = otherTypes.reduce(
         (sum, t) => sum + adjustedPercentages[t],
         0
-      );
+      )
 
       otherTypes.forEach((t) => {
-        const proportion = adjustedPercentages[t] / totalOtherPercentages || 0;
-        adjustedPercentages[t] -= proportion * diff;
-        if (adjustedPercentages[t] < 0) adjustedPercentages[t] = 0;
-        if (adjustedPercentages[t] > 100) adjustedPercentages[t] = 100;
-      });
+        const proportion = adjustedPercentages[t] / totalOtherPercentages || 0
+        adjustedPercentages[t] -= proportion * diff
+        if (adjustedPercentages[t] < 0) adjustedPercentages[t] = 0
+        if (adjustedPercentages[t] > 100) adjustedPercentages[t] = 100
+      })
 
       // Normalize percentages to sum to 100%
       const totalPercentage = Object.values(adjustedPercentages).reduce(
         (a, b) => a + b,
         0
-      );
+      )
       if (totalPercentage !== 100) {
-        const adjustment = 100 - totalPercentage;
+        const adjustment = 100 - totalPercentage
         // Adjust the first non-excluded type
         for (const t of Object.keys(adjustedPercentages)) {
           if (t !== type && !excludedTypes[t]) {
-            adjustedPercentages[t] += adjustment;
-            break;
+            adjustedPercentages[t] += adjustment
+            break
           }
         }
       }
 
-      return adjustedPercentages;
-    });
-  };
+      return adjustedPercentages
+    })
+  }
 
   // Add a Pokémon to exclude list
   const addPokemonToExclude = () => {
     if (excludePokemon.name.trim() !== '') {
-      setExcludePokemonList((prevList) => [...prevList, { ...excludePokemon }]);
-      setExcludePokemon({ type: 'Golden', name: '' });
+      setExcludePokemonList((prevList) => [...prevList, { ...excludePokemon }])
+      setExcludePokemon({ type: 'Golden', name: '' })
     }
-  };
+  }
 
   // Remove a Pokémon from exclude list
   const removeExcludedPokemon = (index) => {
-    setExcludePokemonList((prevList) => prevList.filter((_, i) => i !== index));
-  };
+    setExcludePokemonList((prevList) => prevList.filter((_, i) => i !== index))
+  }
 
   // Format numbers with K, M suffixes
   const formatNumber = (num) => {
     if (num >= 1_000_000) {
-      return (num / 1_000_000).toFixed(2) + 'M';
+      return (num / 1_000_000).toFixed(2) + 'M'
     } else if (num >= 1_000) {
-      return (num / 1_000).toFixed(2) + 'K';
+      return (num / 1_000).toFixed(2) + 'K'
     } else {
-      return num.toString();
+      return num.toString()
     }
-  };
+  }
 
   // Function to group and format the Pokémon data
   const groupPokemon = (pokemonList) => {
-    const grouped = {};
+    const grouped = {}
     const typeTotals = {
       Luminous: 0,
       Cursed: 0,
       Golden: 0,
       Rainbow: 0,
       Shadow: 0,
-    };
+    }
 
     pokemonList.forEach((pokemon) => {
-      const key = `${pokemon.name} ${pokemon.gender || ''} - Level: ${pokemon.level}`;
+      const key = `${pokemon.name} ${pokemon.gender || ''} - Level: ${pokemon.level}`
       if (!grouped[key]) {
-        grouped[key] = { ...pokemon, count: 1 };
+        grouped[key] = { ...pokemon, count: 1 }
       } else {
-        grouped[key].count += 1;
+        grouped[key].count += 1
       }
 
       // Calculate totals per type for the chart
       if (typeTotals[pokemon.type] !== undefined) {
-        typeTotals[pokemon.type] += pokemon.rate;
+        typeTotals[pokemon.type] += pokemon.rate
       }
-    });
+    })
 
     // Update the categorized totals state in Recoil
-    setCategorizedTotals(typeTotals);
+    setCategorizedTotals(typeTotals)
 
     // Convert the grouped object into an array for rendering
     return Object.entries(grouped).map(([key, details]) => {
-      const totalRate = details.rate * details.count;
+      const totalRate = details.rate * details.count
       return {
         ...details,
         display: `${details.count}x ${details.name} ${
           details.gender ? `(${details.gender})` : ''
         } - Level: ${details.level} [${formatNumber(totalRate)}]`,
-      };
-    });
-  };
+      }
+    })
+  }
 
   // Main function to get trade suggestions
   const handleGetTradeSuggestions = async () => {
-    setLoading(true);
-    setMessage('');
-    setTradeSuggestions([]);
-    setTradingForDetails(tradingForList);
+    setLoading(true)
+    setMessage('')
+    setTradeSuggestions([])
+    setTradingForDetails(tradingForList)
 
     // Fetch costs for all items with empty cost fields
-    await fetchCostsForAll();
+    await fetchCostsForAll()
 
     // Recalculate total trading value
-    let total = 0;
+    let total = 0
     tradingForList.forEach((item) => {
-      let cost = parseFloat(item.cost);
-      if (isNaN(cost)) cost = 0;
+      let cost = parseFloat(item.cost)
+      if (isNaN(cost)) cost = 0
       if (item.currency === 'M') {
-        cost *= 1_000_000;
+        cost *= 1_000_000
       } else if (item.currency === 'K') {
-        cost *= 1_000;
+        cost *= 1_000
       }
-      total += cost;
-    });
-    setTotalTradingForValue(total);
+      total += cost
+    })
+    setTotalTradingForValue(total)
 
     try {
       // Fetch the user's box
       const response = await fetch(
         `https://pokemoncreed.net/ajax/box.php?user=${username}`
-      );
-      const data = await response.json();
+      )
+      const data = await response.json()
 
       if (data.success) {
-        const result = data.data;
-        const uname = result.name;
+        const result = data.data
+        const uname = result.name
 
         // Excluded types and Pokémon
         const excludedTypeList = Object.keys(excludedTypes).filter(
           (type) => excludedTypes[type]
-        );
+        )
 
         // Map of excluded Pokémon names with types
-        const excludedPokemonMap = {};
+        const excludedPokemonMap = {}
         excludePokemonList.forEach((item) => {
-          const key = `${item.type.toLowerCase()}${item.name.toLowerCase()}`;
-          excludedPokemonMap[key] = true;
-        });
+          const key = `${item.type.toLowerCase()}${item.name.toLowerCase()}`
+          excludedPokemonMap[key] = true
+        })
 
-        const coloreds = ['Cursed', 'Golden', 'Luminous', 'Rainbow', 'Shadow'];
+        const coloreds = ['Cursed', 'Golden', 'Luminous', 'Rainbow', 'Shadow']
 
-        let availablePokemon = [];
+        let availablePokemon = []
 
         // Process the box
         result.pokemon.forEach((poke) => {
           if (poke.loan === '0') {
-            const pokeName = poke.name;
-            const lowerPokeName = pokeName.toLowerCase();
+            const pokeName = poke.name
+            const lowerPokeName = pokeName.toLowerCase()
 
             // Check if the Pokémon is of a colored type
             const pokeType = coloreds.find((color) =>
               lowerPokeName.startsWith(color.toLowerCase())
-            );
+            )
             if (pokeType && !excludedTypeList.includes(pokeType)) {
               // Check if the Pokémon is in the excluded Pokémon list
               const nameWithoutType = lowerPokeName.replace(
                 pokeType.toLowerCase(),
                 ''
-              );
-              const excludeKey = `${pokeType.toLowerCase()}${nameWithoutType}`;
+              )
+              const excludeKey = `${pokeType.toLowerCase()}${nameWithoutType}`
               if (!excludedPokemonMap[excludeKey]) {
                 // Check for unbased exclusion
                 if (!(excludedTypes['unbased'] && poke.level > 5)) {
@@ -402,69 +407,69 @@ const QuickTrade = () => {
                     gender: poke.gender,
                     level: poke.level,
                     type: pokeType,
-                  });
+                  })
                 }
               }
             }
           }
-        });
+        })
 
         if (availablePokemon.length === 0) {
-          setMessage(`${uname} has no available Pokémon for trading.`);
-          setLoading(false);
-          return;
+          setMessage(`${uname} has no available Pokémon for trading.`)
+          setLoading(false)
+          return
         }
 
         // Fetch rates for available Pokémon
         const foundRates = await fetchRates(
           Array.from(new Set(availablePokemon.map((p) => p.name.toLowerCase())))
-        );
+        )
 
         // Attach rates to Pokémon
         availablePokemon = availablePokemon.map((poke) => ({
           ...poke,
           rate: foundRates[poke.name.toLowerCase()] || 0,
-        }));
+        }))
 
         // Filter out Pokémon with zero rate
-        availablePokemon = availablePokemon.filter((poke) => poke.rate > 0);
+        availablePokemon = availablePokemon.filter((poke) => poke.rate > 0)
 
-        let selectedPokemon = [];
+        let selectedPokemon = []
 
         if (usePercentages) {
           // Selection based on percentages
           // Group Pokémon by type
-          const pokemonByType = {};
-          const includedTypes = Object.keys(percentages);
+          const pokemonByType = {}
+          const includedTypes = Object.keys(percentages)
           includedTypes.forEach((type) => {
             pokemonByType[type] = availablePokemon.filter(
               (poke) => poke.type === type
-            );
-          });
+            )
+          })
 
           // Select Pokémon based on percentages without exceeding total value
-          const desiredValuesByType = {};
+          const desiredValuesByType = {}
           // Total percentage is guaranteed to be 100%
           for (const type of includedTypes) {
-            const percentage = percentages[type] / 100;
-            desiredValuesByType[type] = totalTradingForValue * percentage;
+            const percentage = percentages[type] / 100
+            desiredValuesByType[type] = totalTradingForValue * percentage
           }
 
-          let remainingValue = totalTradingForValue;
+          let remainingValue = totalTradingForValue
 
           for (const type of includedTypes) {
-            let desiredValue = desiredValuesByType[type];
-            let accumulatedValue = 0;
+            let desiredValue = desiredValuesByType[type]
+            let accumulatedValue = 0
 
             // Sort Pokémon by rate descending
-            pokemonByType[type].sort((a, b) => b.rate - a.rate);
+            pokemonByType[type].sort((a, b) => b.rate - a.rate)
 
             for (const poke of pokemonByType[type]) {
-              if (accumulatedValue >= desiredValue || remainingValue <= 0) break;
-              if (accumulatedValue + poke.rate > desiredValue) continue;
-              selectedPokemon.push(poke);
-              accumulatedValue += poke.rate;
-              remainingValue -= poke.rate;
+              if (accumulatedValue >= desiredValue || remainingValue <= 0) break
+              if (accumulatedValue + poke.rate > desiredValue) continue
+              selectedPokemon.push(poke)
+              accumulatedValue += poke.rate
+              remainingValue -= poke.rate
             }
           }
 
@@ -472,61 +477,61 @@ const QuickTrade = () => {
           if (remainingValue > 0) {
             const remainingPokemon = availablePokemon.filter(
               (poke) => !selectedPokemon.includes(poke)
-            );
+            )
 
             // Sort remaining Pokémon by rate descending
-            remainingPokemon.sort((a, b) => b.rate - a.rate);
+            remainingPokemon.sort((a, b) => b.rate - a.rate)
 
             for (const poke of remainingPokemon) {
-              if (remainingValue <= 0) break;
-              if (selectedPokemon.includes(poke)) continue;
+              if (remainingValue <= 0) break
+              if (selectedPokemon.includes(poke)) continue
               if (poke.rate <= remainingValue) {
-                selectedPokemon.push(poke);
-                remainingValue -= poke.rate;
+                selectedPokemon.push(poke)
+                remainingValue -= poke.rate
               }
             }
           }
         } else {
           // Selection without considering percentages
-          let remainingValue = totalTradingForValue;
+          let remainingValue = totalTradingForValue
 
           // Sort all available Pokémon by rate descending
           let allAvailablePokemon = availablePokemon
             .slice()
-            .sort((a, b) => b.rate - a.rate);
+            .sort((a, b) => b.rate - a.rate)
 
           for (const poke of allAvailablePokemon) {
-            if (remainingValue <= 0) break;
+            if (remainingValue <= 0) break
             if (poke.rate <= remainingValue) {
-              selectedPokemon.push(poke);
-              remainingValue -= poke.rate;
+              selectedPokemon.push(poke)
+              remainingValue -= poke.rate
             }
           }
         }
 
         // Group selected Pokémon and update categorized totals
-        const groupedPokemon = groupPokemon(selectedPokemon);
+        const groupedPokemon = groupPokemon(selectedPokemon)
 
-        setTradeSuggestions(groupedPokemon);
-        setMessage('Trade suggestions generated successfully.');
+        setTradeSuggestions(groupedPokemon)
+        setMessage('Trade suggestions generated successfully.')
       } else {
-        setMessage('Username not found!');
+        setMessage('Username not found!')
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
-      setMessage('An error occurred while fetching data.');
+      console.error('Error fetching data:', error)
+      setMessage('An error occurred while fetching data.')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   // Function to fetch rates
   const fetchRates = async (pokeNames) => {
-    const ratesCache = ratesCacheRef.current;
+    const ratesCache = ratesCacheRef.current
     const ratePromises = pokeNames.map(async (pokeName) => {
       if (ratesCache[pokeName]) {
         // Return cached rate
-        return { [pokeName]: ratesCache[pokeName] };
+        return { [pokeName]: ratesCache[pokeName] }
       } else {
         // Fetch rate from API
         return fetch(
@@ -536,39 +541,39 @@ const QuickTrade = () => {
         )
           .then((response) => response.json())
           .then((rateData) => {
-            const rate = rateData.rating || 'N/A';
+            const rate = rateData.rating || 'N/A'
             if (rate === 'N/A') {
-              ratesCache[pokeName] = 0;
-              return { [pokeName]: 0 };
+              ratesCache[pokeName] = 0
+              return { [pokeName]: 0 }
             }
-            let formattedRate;
+            let formattedRate
             if (rate.includes('m')) {
-              formattedRate = parseFloat(rate.replace('m', '')) * 1_000_000;
+              formattedRate = parseFloat(rate.replace('m', '')) * 1_000_000
             } else if (rate.includes('k')) {
-              formattedRate = parseFloat(rate.replace('k', '')) * 1_000;
+              formattedRate = parseFloat(rate.replace('k', '')) * 1_000
             } else {
-              formattedRate = parseFloat(rate);
+              formattedRate = parseFloat(rate)
             }
-            ratesCache[pokeName] = formattedRate;
-            return { [pokeName]: formattedRate };
+            ratesCache[pokeName] = formattedRate
+            return { [pokeName]: formattedRate }
           })
           .catch((error) => {
-            console.error(`Error fetching rate for ${pokeName}:`, error);
-            ratesCache[pokeName] = 0;
-            return { [pokeName]: 0 };
-          });
+            console.error(`Error fetching rate for ${pokeName}:`, error)
+            ratesCache[pokeName] = 0
+            return { [pokeName]: 0 }
+          })
       }
-    });
+    })
 
-    const ratesArray = await Promise.all(ratePromises);
-    return ratesArray.reduce((acc, rate) => ({ ...acc, ...rate }), {});
-  };
+    const ratesArray = await Promise.all(ratePromises)
+    return ratesArray.reduce((acc, rate) => ({ ...acc, ...rate }), {})
+  }
 
   return (
     <Card className="shadow-lg p-4 mb-5 rounded">
       <CardBody>
         <CardTitle tag="h2" className="mb-4 text-center">
-          Quick Trade
+          Trade Helper
         </CardTitle>
         <Form>
           <Row form className="align-items-center mb-4">
@@ -609,9 +614,8 @@ const QuickTrade = () => {
             <CardBody>
               <CardTitle tag="h4" className="mb-3">
                 Trading For
-               
               </CardTitle>
-  
+
               {tradingForList.map((item, index) => (
                 <Row form key={item.id} className="align-items-end">
                   <Col md={2}>
@@ -621,7 +625,13 @@ const QuickTrade = () => {
                         type="select"
                         id={`type-${item.id}`}
                         value={item.type}
-                        onChange={(e) => handleTradingForChange(item.id, 'type', e.target.value)}
+                        onChange={(e) =>
+                          handleTradingForChange(
+                            item.id,
+                            'type',
+                            e.target.value
+                          )
+                        }
                       >
                         <option>Golden</option>
                         <option>Cursed</option>
@@ -638,7 +648,13 @@ const QuickTrade = () => {
                         type="text"
                         id={`name-${item.id}`}
                         value={item.name}
-                        onChange={(e) => handleTradingForChange(item.id, 'name', e.target.value)}
+                        onChange={(e) =>
+                          handleTradingForChange(
+                            item.id,
+                            'name',
+                            e.target.value
+                          )
+                        }
                         onBlur={() => fetchCostIfEmpty(item.id)}
                       />
                     </FormGroup>
@@ -650,7 +666,13 @@ const QuickTrade = () => {
                         type="text"
                         id={`cost-${item.id}`}
                         value={item.cost}
-                        onChange={(e) => handleTradingForChange(item.id, 'cost', e.target.value)}
+                        onChange={(e) =>
+                          handleTradingForChange(
+                            item.id,
+                            'cost',
+                            e.target.value
+                          )
+                        }
                       />
                     </FormGroup>
                   </Col>
@@ -662,7 +684,11 @@ const QuickTrade = () => {
                         id={`currency-${item.id}`}
                         value={item.currency}
                         onChange={(e) =>
-                          handleTradingForChange(item.id, 'currency', e.target.value)
+                          handleTradingForChange(
+                            item.id,
+                            'currency',
+                            e.target.value
+                          )
                         }
                       >
                         <option>K</option>
@@ -685,14 +711,14 @@ const QuickTrade = () => {
                 </Row>
               ))}
               <Button
-              color="success"
-              size="sm"
-              onClick={addTradingForItem}
-              className="mt-3"
+                color="success"
+                size="sm"
+                onClick={addTradingForItem}
+                className="mt-3"
               >
                 + Add Item
-                </Button>
-      
+              </Button>
+
               <h5 className="mt-4">
                 Total Trading For Value: {formatNumber(totalTradingForValue)}
               </h5>
@@ -710,7 +736,9 @@ const QuickTrade = () => {
                         <Input
                           type="checkbox"
                           checked={excludedTypes[type]}
-                          onChange={(e) => handleExcludeTypeChange(type, e.target.checked)}
+                          onChange={(e) =>
+                            handleExcludeTypeChange(type, e.target.checked)
+                          }
                         />{' '}
                         {type}
                       </Label>
@@ -740,7 +768,10 @@ const QuickTrade = () => {
                         id="exclude-type"
                         value={excludePokemon.type}
                         onChange={(e) =>
-                          setExcludePokemon({ ...excludePokemon, type: e.target.value })
+                          setExcludePokemon({
+                            ...excludePokemon,
+                            type: e.target.value,
+                          })
                         }
                       >
                         <option>Golden</option>
@@ -759,7 +790,10 @@ const QuickTrade = () => {
                         id="exclude-name"
                         value={excludePokemon.name}
                         onChange={(e) =>
-                          setExcludePokemon({ ...excludePokemon, name: e.target.value })
+                          setExcludePokemon({
+                            ...excludePokemon,
+                            name: e.target.value,
+                          })
                         }
                       />
                     </FormGroup>
@@ -775,7 +809,10 @@ const QuickTrade = () => {
                     <Label>Excluded Pokémon:</Label>
                     <ListGroup>
                       {excludePokemonList.map((item, index) => (
-                        <ListGroupItem key={index} className="d-flex justify-content-between">
+                        <ListGroupItem
+                          key={index}
+                          className="d-flex justify-content-between"
+                        >
                           {item.type} {item.name}
                           <Button
                             size="sm"
@@ -831,7 +868,9 @@ const QuickTrade = () => {
                           min="0"
                           max="100"
                           value={percentages[type]}
-                          onChange={(e) => handlePercentageChange(type, e.target.value)}
+                          onChange={(e) =>
+                            handlePercentageChange(type, e.target.value)
+                          }
                         />
                       </FormGroup>
                     ) : null
@@ -862,8 +901,8 @@ const QuickTrade = () => {
                         (item.currency === 'M'
                           ? 1_000_000
                           : item.currency === 'K'
-                          ? 1_000
-                          : 1)
+                            ? 1_000
+                            : 1)
                     )}
                   </ListGroupItem>
                 ))}
@@ -888,7 +927,7 @@ const QuickTrade = () => {
         )}
       </CardBody>
     </Card>
-  );
-};
+  )
+}
 
-export default QuickTrade;
+export default TradeHelper

@@ -1,6 +1,6 @@
-import React from "react";
-import "../../assets/scss/layout/loader.scss";
-import { Spinner } from "reactstrap";
+import React from 'react'
+import '../../assets/scss/layout/loader.scss'
+import { Spinner } from 'reactstrap'
 
 const Loader = () => (
   <div className="fallback-spinner">
@@ -8,5 +8,5 @@ const Loader = () => (
       <Spinner color="primary" />
     </div>
   </div>
-);
-export default Loader;
+)
+export default Loader

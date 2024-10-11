@@ -1,10 +1,10 @@
 /* style.scss */
 
-@import "variables";
-@import "~bootstrap/scss/bootstrap";
-@import "~bootstrap-icons/font/bootstrap-icons.scss";
-@import "./layout/sidebar";
-@import "./layout/container";
+@import 'variables';
+@import '~bootstrap/scss/bootstrap';
+@import '~bootstrap-icons/font/bootstrap-icons.scss';
+@import './layout/sidebar';
+@import './layout/container';
 
 /* Light Theme (Default) */
 :root {
@@ -77,18 +77,26 @@ a:hover {
   color: var(--primary);
 }
 
-button, .btn {
+button,
+.btn {
   background-color: var(--primary);
   color: var(--body-bg);
   border: none;
 }
 
-button:hover, .btn:hover {
+button:hover,
+.btn:hover {
   background-color: var(--dark);
   color: var(--body-bg);
 }
 
 /* Optional transition for smooth theme change */
-body, .header, .sidebarArea, .contentArea, .card {
-  transition: background-color 0.3s ease, color 0.3s ease;
+body,
+.header,
+.sidebarArea,
+.contentArea,
+.card {
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
