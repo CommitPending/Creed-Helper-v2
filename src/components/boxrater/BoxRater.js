@@ -4,7 +4,6 @@ import {
   Card,
   CardBody,
   CardTitle,
-  CardSubtitle,
   Form,
   FormGroup,
   Label,
@@ -137,26 +136,40 @@ const BoxRater = () => {
     }
   }
 
-  const fetchRates = async (findrates) => {
-    const ratePromises = findrates.map((pokeName) =>
-      fetch(`https://pokemoncreed.net/ajax/pokedex.php?pokemon=${pokeName}`)
-        .then((response) => response.json())
-        .then((rateData) => {
-          const rate = rateData.rating || '0'
-          const formattedRate = rate.includes('m')
-            ? parseFloat(rate) * 1_000_000
-            : parseFloat(rate.replace('k', '')) * 1_000
-          return { [pokeName]: formattedRate }
-        })
-        .catch((error) => {
-          console.error(`Error fetching rate for ${pokeName}:`, error)
-          return { [pokeName]: 0 }
-        })
-    )
+  const rateCache = {};
 
-    const ratesArray = await Promise.all(ratePromises)
-    return ratesArray.reduce((acc, rate) => ({ ...acc, ...rate }), {})
-  }
+const fetchRates = async (findrates) => {
+  const ratePromises = findrates.map((pokeName) => {
+    // Check if the rate is already in the cache
+    if (rateCache[pokeName]) {
+      console.log(`Using cached rate for ${pokeName}`)
+      // Return a resolved promise with the cached value
+      return Promise.resolve({ [pokeName]: rateCache[pokeName] })
+    }
+
+    // If not cached, fetch from the API
+    return fetch(`https://pokemoncreed.net/ajax/pokedex.php?pokemon=${pokeName}`)
+      .then((response) => response.json())
+      .then((rateData) => {
+        console.log("i made an api call")
+        const rate = rateData.rating || '0'
+        const formattedRate = rate.includes('m')
+          ? parseFloat(rate) * 1_000_000
+          : parseFloat(rate.replace('k', '')) * 1_000
+
+        // Store the rate in the cache
+        rateCache[pokeName] = formattedRate
+        return { [pokeName]: formattedRate }
+      })
+      .catch((error) => {
+        console.error(`Error fetching rate for ${pokeName}:`, error)
+        return { [pokeName]: 0 }
+      })
+  })
+
+  const ratesArray = await Promise.all(ratePromises)
+  return ratesArray.reduce((acc, rate) => ({ ...acc, ...rate }), {})
+}
 
   const calculateAndFormatRatings = (pokemonList, foundRates) => {
     let totalRating = 0

@@ -145,7 +145,11 @@ const PokemonInBox = () => {
               Considered and Ignored Pokémon
             </CardSubtitle>
           </div>
-          <Button color="primary" onClick={downloadExcel}>
+          <Button
+            color="primary"
+            onClick={downloadExcel}
+            disabled={pokemonDetails.consideredPokemon.length === 0}
+          >
             Download Excel Sheet
           </Button>
         </div>
