@@ -1,10 +1,19 @@
 # Creed Helper v2.0
 
-Creed Helper 2.0 is a comprehensive tool designed to assist Pokémon traders in optimizing their trades. Whether you're looking to trade specific Pokémon types, manage trade allocations based on percentages, or exclude certain Pokémon from your trading pool, Creed Helper 2.0 offers a seamless and intuitive interface to enhance your trading experience.
+Creed Helper 2.0 is a comprehensive tool designed for Pokémon traders to optimize and manage their trades efficiently. Whether you're aiming to trade specific Pokémon types, allocate trades based on percentages, or exclude certain Pokémon from your trading pool, Creed Helper 2.0 provides a seamless and user-friendly interface to enhance your trading experience.
 
 # Setup on local
 
 1. Clone the Repo
-2. Open an IDE & navigate to main directory (make sure you have node installed)
-3. run npm i
-4. run npm start
+ ```
+ git clone https://github.com/CommitPending/Creed-Helper-v2.git
+ ```
+2. Open an IDE & Navigate to the Main Directory (Ensure you have Node.js installed on your system.)
+3. Install Dependencies by running the following command:
+```
+npm install
+```
+4. Start the Application
+```
+npm start
+```
