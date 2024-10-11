@@ -1,17 +1,17 @@
 {
   "files": {
     "main.css": "/Creed-Helper-v2/static/css/main.b1a844a7.css",
-    "main.js": "/Creed-Helper-v2/static/js/main.112b8a2c.js",
+    "main.js": "/Creed-Helper-v2/static/js/main.02f30b24.js",
     "static/js/488.f34c5986.chunk.js": "/Creed-Helper-v2/static/js/488.f34c5986.chunk.js",
     "static/media/bootstrap-icons.woff?": "/Creed-Helper-v2/static/media/bootstrap-icons.4753c5ba57962b4d7bf8.woff",
     "static/media/bootstrap-icons.woff2?": "/Creed-Helper-v2/static/media/bootstrap-icons.6d63d0501e5ed7b79dab.woff2",
     "index.html": "/Creed-Helper-v2/index.html",
     "main.b1a844a7.css.map": "/Creed-Helper-v2/static/css/main.b1a844a7.css.map",
-    "main.112b8a2c.js.map": "/Creed-Helper-v2/static/js/main.112b8a2c.js.map",
+    "main.02f30b24.js.map": "/Creed-Helper-v2/static/js/main.02f30b24.js.map",
     "488.f34c5986.chunk.js.map": "/Creed-Helper-v2/static/js/488.f34c5986.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.b1a844a7.css",
-    "static/js/main.112b8a2c.js"
+    "static/js/main.02f30b24.js"
   ]
 }
