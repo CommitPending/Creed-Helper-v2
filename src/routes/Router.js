@@ -1,10 +1,8 @@
-// routes/Router.js
-import { lazy } from "react";
 import { Navigate } from "react-router-dom";
+import FullLayout from "../layouts/FullLayout.js";
+import BoxRater from "../pages/BoxRater.js";
+import QuickTrade from "../pages/QuickTrade.js";
 
-const FullLayout = lazy(() => import("../layouts/FullLayout.js"));
-const BoxRater = lazy(() => import("../pages/BoxRater.js"));
-const QuickTrade = lazy(() => import("../pages/QuickTrade.js"));
 
 const ThemeRoutes = [
   {
@@ -12,8 +10,8 @@ const ThemeRoutes = [
     element: <FullLayout />,
     children: [
       { path: "/", element: <Navigate to="box-rater" replace /> }, 
-      { path: "box-rater", element: <BoxRater /> }, 
-      { path: "quick-trade", element: <QuickTrade /> }, 
+      { path: "box-rater", element: <BoxRater /> },
+      { path: "quick-trade", element: <QuickTrade /> },
       { path: "input-rater", element: <BoxRater /> }, 
       { path: "*", element: <Navigate to="box-rater" replace /> }, 
     ],
