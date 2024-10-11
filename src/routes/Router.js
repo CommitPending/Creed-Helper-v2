@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom'
+import React, { Navigate } from 'react-router-dom'
 import FullLayout from '../layouts/FullLayout.js'
 import BoxRater from '../pages/BoxRater.js'
 import TradeHelper from '../pages/TradeHelper.js'

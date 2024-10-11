@@ -1,5 +1,4 @@
-// QuickTrade.js
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Card,
   CardBody,
@@ -19,18 +18,16 @@ import {
   UncontrolledTooltip,
 } from 'reactstrap'
 import { useSetRecoilState } from 'recoil'
-import { categorizedTotalsState } from '../components/recoil/recoilState' // Import the Recoil atom
-import PokeChart from '../components/boxrater/PokeChart' // Import the PokeChart component
+import { categorizedTotalsState } from '../components/recoil/recoilState' 
+import PokeChart from '../components/boxrater/PokeChart' 
 
 const TradeHelper = () => {
-  // State for 'Trading For' portion
   const [tradingForList, setTradingForList] = useState([
     { id: 1, type: 'Golden', name: '', cost: '', currency: 'K' },
   ])
 
   const [totalTradingForValue, setTotalTradingForValue] = useState(0)
 
-  // State for username and options
   const [username, setUsername] = useState('')
   const [excludedTypes, setExcludedTypes] = useState({
     Golden: false,
@@ -60,17 +57,13 @@ const TradeHelper = () => {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // State for trade suggestions
   const [tradeSuggestions, setTradeSuggestions] = useState([])
   const [tradingForDetails, setTradingForDetails] = useState([])
 
-  // Rates cache to reduce API calls
   const ratesCacheRef = useRef({})
 
-  // Recoil state setters
   const setCategorizedTotals = useSetRecoilState(categorizedTotalsState)
 
-  // Handle changes in 'Trading For' list
   const handleTradingForChange = (id, field, value) => {
     setTradingForList((prevList) =>
       prevList.map((item) =>
@@ -79,7 +72,6 @@ const TradeHelper = () => {
     )
   }
 
-  // Add a new item to 'Trading For' list
   const addTradingForItem = () => {
     setTradingForList((prevList) => [
       ...prevList,
@@ -93,12 +85,10 @@ const TradeHelper = () => {
     ])
   }
 
-  // Remove an item from 'Trading For' list
   const removeTradingForItem = (id) => {
     setTradingForList((prevList) => prevList.filter((item) => item.id !== id))
   }
 
-  // Fetch cost if the cost field is empty
   const fetchCostIfEmpty = async (id) => {
     const item = tradingForList.find((i) => i.id === id)
     if (item && item.cost.trim() === '') {
@@ -120,16 +110,15 @@ const TradeHelper = () => {
           let formattedCost
           let currency
           if (rate.includes('m')) {
-            formattedCost = parseFloat(rate.replace('m', '')) // e.g., '1.5m' => 1.5
+            formattedCost = parseFloat(rate.replace('m', ''))
             currency = 'M'
           } else if (rate.includes('k')) {
-            formattedCost = parseFloat(rate.replace('k', '')) // e.g., '500k' => 500
+            formattedCost = parseFloat(rate.replace('k', ''))
             currency = 'K'
           } else {
             formattedCost = parseFloat(rate)
             currency = ''
           }
-          // Update the cost field
           setTradingForList((prevList) =>
             prevList.map((i) =>
               i.id === id
@@ -145,7 +134,6 @@ const TradeHelper = () => {
     }
   }
 
-  // Fetch costs for all items with empty cost fields before generating suggestions
   const fetchCostsForAll = async () => {
     const fetchPromises = tradingForList.map(async (item) => {
       if (item.cost.trim() === '') {
@@ -155,7 +143,6 @@ const TradeHelper = () => {
     await Promise.all(fetchPromises)
   }
 
-  // Calculate total 'Trading For' value whenever the list changes
   useEffect(() => {
     let total = 0
     tradingForList.forEach((item) => {
@@ -171,19 +158,16 @@ const TradeHelper = () => {
     setTotalTradingForValue(total)
   }, [tradingForList])
 
-  // Handle exclude type changes
   const handleExcludeTypeChange = (type, checked) => {
     setExcludedTypes((prev) => ({
       ...prev,
       [type]: checked,
     }))
 
-    // Adjust percentages
     setPercentages((prevPercentages) => {
       const newPercentages = { ...prevPercentages }
 
       if (checked) {
-        // Type is being excluded
         const excludedPercentage = newPercentages[type] || 0
         delete newPercentages[type]
 
@@ -193,23 +177,19 @@ const TradeHelper = () => {
           0
         )
 
-        // Redistribute the excluded percentage among remaining types proportionally
         remainingTypes.forEach((t) => {
           newPercentages[t] +=
             (newPercentages[t] / totalRemaining) * excludedPercentage
         })
       } else {
-        // Type is being included
         const includedTypes = Object.keys(newPercentages)
         const totalIncluded = includedTypes.reduce(
           (sum, t) => sum + newPercentages[t],
           0
         )
 
-        // Add the type with 0% initially
         newPercentages[type] = 0
 
-        // Adjust percentages to sum to 100%
         Object.keys(newPercentages).forEach((t) => {
           newPercentages[t] = (newPercentages[t] / totalIncluded) * 100
         })
@@ -219,7 +199,6 @@ const TradeHelper = () => {
     })
   }
 
-  // Handle percentage changes
   const handlePercentageChange = (type, value) => {
     value = Number(value)
     if (value < 0) value = 0
@@ -247,14 +226,12 @@ const TradeHelper = () => {
         if (adjustedPercentages[t] > 100) adjustedPercentages[t] = 100
       })
 
-      // Normalize percentages to sum to 100%
       const totalPercentage = Object.values(adjustedPercentages).reduce(
         (a, b) => a + b,
         0
       )
       if (totalPercentage !== 100) {
         const adjustment = 100 - totalPercentage
-        // Adjust the first non-excluded type
         for (const t of Object.keys(adjustedPercentages)) {
           if (t !== type && !excludedTypes[t]) {
             adjustedPercentages[t] += adjustment
@@ -267,7 +244,6 @@ const TradeHelper = () => {
     })
   }
 
-  // Add a Pokémon to exclude list
   const addPokemonToExclude = () => {
     if (excludePokemon.name.trim() !== '') {
       setExcludePokemonList((prevList) => [...prevList, { ...excludePokemon }])
@@ -275,12 +251,10 @@ const TradeHelper = () => {
     }
   }
 
-  // Remove a Pokémon from exclude list
   const removeExcludedPokemon = (index) => {
     setExcludePokemonList((prevList) => prevList.filter((_, i) => i !== index))
   }
 
-  // Format numbers with K, M suffixes
   const formatNumber = (num) => {
     if (num >= 1_000_000) {
       return (num / 1_000_000).toFixed(2) + 'M'
@@ -291,7 +265,6 @@ const TradeHelper = () => {
     }
   }
 
-  // Function to group and format the Pokémon data
   const groupPokemon = (pokemonList) => {
     const grouped = {}
     const typeTotals = {
@@ -310,16 +283,13 @@ const TradeHelper = () => {
         grouped[key].count += 1
       }
 
-      // Calculate totals per type for the chart
       if (typeTotals[pokemon.type] !== undefined) {
         typeTotals[pokemon.type] += pokemon.rate
       }
     })
 
-    // Update the categorized totals state in Recoil
     setCategorizedTotals(typeTotals)
 
-    // Convert the grouped object into an array for rendering
     return Object.entries(grouped).map(([key, details]) => {
       const totalRate = details.rate * details.count
       return {
@@ -331,17 +301,14 @@ const TradeHelper = () => {
     })
   }
 
-  // Main function to get trade suggestions
   const handleGetTradeSuggestions = async () => {
     setLoading(true)
     setMessage('')
     setTradeSuggestions([])
     setTradingForDetails(tradingForList)
 
-    // Fetch costs for all items with empty cost fields
     await fetchCostsForAll()
 
-    // Recalculate total trading value
     let total = 0
     tradingForList.forEach((item) => {
       let cost = parseFloat(item.cost)
@@ -356,7 +323,6 @@ const TradeHelper = () => {
     setTotalTradingForValue(total)
 
     try {
-      // Fetch the user's box
       const response = await fetch(
         `https://pokemoncreed.net/ajax/box.php?user=${username}`
       )
@@ -366,12 +332,10 @@ const TradeHelper = () => {
         const result = data.data
         const uname = result.name
 
-        // Excluded types and Pokémon
         const excludedTypeList = Object.keys(excludedTypes).filter(
           (type) => excludedTypes[type]
         )
 
-        // Map of excluded Pokémon names with types
         const excludedPokemonMap = {}
         excludePokemonList.forEach((item) => {
           const key = `${item.type.toLowerCase()}${item.name.toLowerCase()}`
@@ -382,25 +346,21 @@ const TradeHelper = () => {
 
         let availablePokemon = []
 
-        // Process the box
         result.pokemon.forEach((poke) => {
           if (poke.loan === '0') {
             const pokeName = poke.name
             const lowerPokeName = pokeName.toLowerCase()
 
-            // Check if the Pokémon is of a colored type
             const pokeType = coloreds.find((color) =>
               lowerPokeName.startsWith(color.toLowerCase())
             )
             if (pokeType && !excludedTypeList.includes(pokeType)) {
-              // Check if the Pokémon is in the excluded Pokémon list
               const nameWithoutType = lowerPokeName.replace(
                 pokeType.toLowerCase(),
                 ''
               )
               const excludeKey = `${pokeType.toLowerCase()}${nameWithoutType}`
               if (!excludedPokemonMap[excludeKey]) {
-                // Check for unbased exclusion
                 if (!(excludedTypes['unbased'] && poke.level > 5)) {
                   availablePokemon.push({
                     name: poke.name,
@@ -420,25 +380,20 @@ const TradeHelper = () => {
           return
         }
 
-        // Fetch rates for available Pokémon
         const foundRates = await fetchRates(
           Array.from(new Set(availablePokemon.map((p) => p.name.toLowerCase())))
         )
 
-        // Attach rates to Pokémon
         availablePokemon = availablePokemon.map((poke) => ({
           ...poke,
           rate: foundRates[poke.name.toLowerCase()] || 0,
         }))
 
-        // Filter out Pokémon with zero rate
         availablePokemon = availablePokemon.filter((poke) => poke.rate > 0)
 
         let selectedPokemon = []
 
         if (usePercentages) {
-          // Selection based on percentages
-          // Group Pokémon by type
           const pokemonByType = {}
           const includedTypes = Object.keys(percentages)
           includedTypes.forEach((type) => {
@@ -447,9 +402,7 @@ const TradeHelper = () => {
             )
           })
 
-          // Select Pokémon based on percentages without exceeding total value
           const desiredValuesByType = {}
-          // Total percentage is guaranteed to be 100%
           for (const type of includedTypes) {
             const percentage = percentages[type] / 100
             desiredValuesByType[type] = totalTradingForValue * percentage
@@ -461,7 +414,6 @@ const TradeHelper = () => {
             let desiredValue = desiredValuesByType[type]
             let accumulatedValue = 0
 
-            // Sort Pokémon by rate descending
             pokemonByType[type].sort((a, b) => b.rate - a.rate)
 
             for (const poke of pokemonByType[type]) {
@@ -473,13 +425,11 @@ const TradeHelper = () => {
             }
           }
 
-          // If we have not met the total value, try to add more Pokémon without exceeding the total value
           if (remainingValue > 0) {
             const remainingPokemon = availablePokemon.filter(
               (poke) => !selectedPokemon.includes(poke)
             )
 
-            // Sort remaining Pokémon by rate descending
             remainingPokemon.sort((a, b) => b.rate - a.rate)
 
             for (const poke of remainingPokemon) {
@@ -492,10 +442,8 @@ const TradeHelper = () => {
             }
           }
         } else {
-          // Selection without considering percentages
           let remainingValue = totalTradingForValue
 
-          // Sort all available Pokémon by rate descending
           let allAvailablePokemon = availablePokemon
             .slice()
             .sort((a, b) => b.rate - a.rate)
@@ -509,7 +457,6 @@ const TradeHelper = () => {
           }
         }
 
-        // Group selected Pokémon and update categorized totals
         const groupedPokemon = groupPokemon(selectedPokemon)
 
         setTradeSuggestions(groupedPokemon)
@@ -525,15 +472,12 @@ const TradeHelper = () => {
     }
   }
 
-  // Function to fetch rates
   const fetchRates = async (pokeNames) => {
     const ratesCache = ratesCacheRef.current
     const ratePromises = pokeNames.map(async (pokeName) => {
       if (ratesCache[pokeName]) {
-        // Return cached rate
         return { [pokeName]: ratesCache[pokeName] }
       } else {
-        // Fetch rate from API
         return fetch(
           `https://pokemoncreed.net/ajax/pokedex.php?pokemon=${encodeURIComponent(
             pokeName
@@ -609,7 +553,6 @@ const TradeHelper = () => {
             </Col>
           </Row>
 
-          {/* Trading For Section */}
           <Card className="mb-4">
             <CardBody>
               <CardTitle tag="h4" className="mb-3">
@@ -887,7 +830,6 @@ const TradeHelper = () => {
           </Alert>
         )}
 
-        {/* Display Trading For Details */}
         {tradingForDetails.length > 0 && (
           <Card className="mt-4">
             <CardBody>
